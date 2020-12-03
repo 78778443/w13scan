@@ -54,15 +54,23 @@ def initKb():
 def initPlugins():
     # 加载检测插件
     for root, dirs, files in os.walk(path.scanners):
+        # 获取插件下的文件列表
         files = filter(lambda x: not x.startswith("__") and x.endswith(".py"), files)
+        # 对每一个文件进行处理
         for _ in files:
+            # 获取文件名
             q = os.path.splitext(_)[0]
+            # 判断插件白名单
             if conf.able and q not in conf.able and q != 'loader':
                 continue
+            # 判断插件黑名单
             if conf.disable and q in conf.disable:
                 continue
+            # 文件绝对路径
             filename = os.path.join(root, _)
+            # 加载该文件
             mod = load_file_to_module(filename)
+
             try:
                 mod = mod.W13SCAN()
                 mod.checkImplemennted()
@@ -187,12 +195,18 @@ def _init_stdout():
 def init(root, cmdline):
     cinit(autoreset=True)
     setPaths(root)
+    # 指纹信息
     banner()
-    _init_conf()  # 从config.py读取配置信息
-    _merge_options(cmdline)  # 从cmdline读取配置
+    # 从config.py读取配置信息
+    _init_conf()
+    # 从cmdline读取配置
+    _merge_options(cmdline)
+    # 设置端口信息
     _set_conf()
     initKb()
+    # 加载插件
     initPlugins()
+    # 输出配置信息
     _init_stdout()
     patch_all()
 

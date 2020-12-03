@@ -17,6 +17,7 @@ from lib.core.data import logger, conf, KB
 from lib.core.option import init
 
 
+# python版本不能低于3.6
 def version_check():
     if sys.version.split()[0] < "3.6":
         logger.error(
@@ -40,17 +41,23 @@ def modulePath():
 
 
 def main():
+    # 检查版本信息
     version_check()
 
-    # init
+    # 获取绝对路径
     root = modulePath()
+    # 解析命令行参数
     cmdline = cmd_line_parser()
+    # 初始化执行
     init(root, cmdline)
 
+    # 从命令行中或者文件中读取
     if conf.url or conf.url_file:
         urls = []
+        # 判断命令行中是否填入了URL地址
         if conf.url:
             urls.append(conf.url)
+        # 判断是否从文件中读取URL地址
         if conf.url_file:
             urlfile = conf.url_file
             if not os.path.exists(urlfile):
@@ -60,16 +67,21 @@ def main():
                 _urls = f.readlines()
             _urls = [i.strip() for i in _urls]
             urls.extend(_urls)
+        # 开始对每一条URL做处理，将其插入到队列中
         for domain in urls:
+            # domain = "http://www.achr.net/activities-de.php?id=2"
             try:
                 req = requests.get(domain)
             except Exception as e:
                 logger.error("request {} faild,{}".format(domain, str(e)))
                 continue
+            # 解析URL地址
             fake_req = FakeReq(domain, {}, HTTPMETHOD.GET, "")
             fake_resp = FakeResp(req.status_code, req.content, req.headers)
             task_push_from_name('loader', fake_req, fake_resp)
+        # 从队列中开始扫描
         start()
+    # 如果是用代理模式启动
     elif conf.server_addr:
         KB["continue"] = True
         # 启动漏洞扫描器

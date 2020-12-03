@@ -68,25 +68,38 @@ def start():
 
 
 def task_run():
+    # 遍历队列 task_queue
     while KB["continue"] or not KB["task_queue"].empty():
+        # 获取模块名称 请求  返回值
         poc_module_name, request, response = KB["task_queue"].get()
+
         KB.lock.acquire()
         KB.running += 1
+        # 如果模块名称不在当前运行的模块名称里面,将模块名称初始化
         if poc_module_name not in KB.running_plugins:
             KB.running_plugins[poc_module_name] = 0
+        # 当前模块名称运行数量加1
         KB.running_plugins[poc_module_name] += 1
         KB.lock.release()
+
         printProgress()
+        # 复制模块给实例
         poc_module = copy.deepcopy(KB["registered"][poc_module_name])
+        # 开始执行请求
         poc_module.execute(request, response)
+
         KB.lock.acquire()
+        # 完成数量加——
         KB.finished += 1
+        # 当前运行数量减一
         KB.running -= 1
+        # 当前模块运行数量减一
         KB.running_plugins[poc_module_name] -= 1
+        # 如果当前模块没有运行数量，删除该模块
         if KB.running_plugins[poc_module_name] == 0:
             del KB.running_plugins[poc_module_name]
-
         KB.lock.release()
+
         printProgress()
     printProgress()
     # TODO

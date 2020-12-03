@@ -11,25 +11,26 @@ import types
 class AttribDict(dict):
     """
     This class defines the dictionary with added capability to access members as attributes
+    (该类定义具有附加功能的字典，以作为属性访问成员)
     """
 
     def __init__(self, indict=None, attribute=None):
         if indict is None:
             indict = {}
 
-        # Set any attributes here - before initialisation
-        # these remain as normal attributes
+        # Set any attributes here - before initialisation(在这里设置任何属性——在初始化之前)
+        # these remain as normal attributes(这些仍然是正常的属性)
         self.attribute = attribute
         dict.__init__(self, indict)
         self.__initialised = True
 
-        # After initialisation, setting attributes
-        # is the same as setting an item
+        # After initialisation, setting attributes(初始化后，设置属性)
+        # is the same as setting an item(与设置项相同)
 
     def __getattr__(self, item):
         """
-        Maps values to attributes
-        Only called if there *is NOT* an attribute with this name
+        Maps values to attributes（将值映射到属性）
+        Only called if there *is NOT* an attribute with this name(只有在*没有*属性时才调用)
         """
 
         try:
@@ -39,8 +40,8 @@ class AttribDict(dict):
 
     def __setattr__(self, item, value):
         """
-        Maps attributes to values
-        Only if we are initialised
+        Maps attributes to values(将属性映射到值)
+        Only if we are initialised(只有我们被初始化了)
         """
 
         # This test allows attributes to be set in the __init__ method
