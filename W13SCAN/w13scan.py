@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import inspect
 import os
 import sys
@@ -30,6 +32,7 @@ def modulePath():
     """
     This will get us the program's directory, even if we are frozen
     using py2exe
+    这将得到程序的目录，即使我们被冻结使用py2exe
     """
 
     try:
